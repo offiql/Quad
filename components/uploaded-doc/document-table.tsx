@@ -77,6 +77,7 @@ export default function DocumentTable({
             <TableHead>Date</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Details</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -87,6 +88,18 @@ export default function DocumentTable({
               <TableCell>{doc.date}</TableCell>
               <TableCell>{doc.type}</TableCell>
               <TableCell className="max-w-10 whitespace-nowrap overflow-hidden">{doc.details}</TableCell>
+              <TableCell>
+                    <span
+                      className={`
+                      ${doc.status === "pending" ? "bg-yellow-100 text-yellow-700" : ""}
+                      ${doc.status === "confirmed" ? "bg-green-100 text-green-700" : ""}
+                      ${doc.status === "rejected" ? "bg-red-100 text-red-700" : ""}
+                      p-0.5 px-4 rounded-full text-center mx-auto
+                    `}
+                    >
+                      {doc.status}
+                    </span>
+                  </TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

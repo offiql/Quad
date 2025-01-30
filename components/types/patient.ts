@@ -55,31 +55,28 @@ export interface Relation {
   status: string;
 }
 
-
-
-
 export interface CycleData {
-  startDate: Date
-  endDate: Date
-  type: "actual" | "predicted"
+  startDate: Date;
+  endDate: Date;
+  type: "actual" | "predicted";
 }
 
 export interface PeriodTrackerProps {
-  initialDate?: Date
-  cycles?: CycleData[]
+  initialDate?: Date;
+  cycles?: CycleData[];
 }
 
 export interface DocumentDetails {
-  _id: string
-  doctor: string
-  date: string
-  type: string
-  visit: string
-  summary: string
-  details: string
-  patientId: string
-  fileUrl: string
-  fileKey: string
-  canViewPatients: string[]
+  _id: string;
+  doctor: string;
+  date: string;
+  type: string;
+  status: string;
+  visit: string;
+  summary: string;
+  details: string;
+  patientId: string;
+  fileUrl: string;
+  fileKey: string;
+  canViewPatients: string[];
 }
-
