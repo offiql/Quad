@@ -1,8 +1,8 @@
+import ReduxProvider from "@/components/ProviderComponent";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import "./globals.css";
-import ReduxProvider from "@/components/ProviderComponent";
 import NextTopLoader from "nextjs-toploader";
+import "./globals.css";
 import { Toaster } from "sonner";
 
 const poppins = Poppins({
@@ -25,8 +25,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased`}>
         <NextTopLoader color="#3B0764" />
-        <ReduxProvider>{children}</ReduxProvider>
         <Toaster richColors position="top-right" closeButton />
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );

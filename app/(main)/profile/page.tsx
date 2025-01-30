@@ -1,10 +1,11 @@
 import MobileHeader from "@/components/mobile-header";
+import PatientProfile from "@/components/profile/patientProfile";
 
 export default function ProfilePage() {
   return (
-    <main>
+    <main className="h-full w-full">
       <MobileHeader />
-      <section>Profile</section>
+      <PatientProfile />
     </main>
   );
 }

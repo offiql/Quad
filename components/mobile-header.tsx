@@ -1,24 +1,25 @@
 "use client";
 
-import { Menu, User } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
   SheetTitle,
-  SheetClose,
+  SheetTrigger,
 } from "@/components/ui/sheet";
-import ProfileSection from "./profile-section";
-import Notifications from "./notifications";
+import { getpatientData } from "@/lib/getTokens";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
 import KidsVacinations from "./KidsVacinations";
 import Sidebar from "./mobile-sidebar";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import Notifications from "./notifications";
+import ProfileSection from "./profile-section";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export default function MobileHeader() {
   const pathname = usePathname();
-
+  const patient = getpatientData();
   const getTitle = () => {
     switch (pathname) {
       case "/dashboard":
@@ -35,7 +36,8 @@ export default function MobileHeader() {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 md:hidden">
+    <div className="sticky top-0 z-50">
+      <div className="flex items-center bg-white justify-between p-4 md:hidden">
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon">
@@ -57,8 +59,14 @@ export default function MobileHeader() {
       <Sheet>
         <SheetTrigger asChild>
           <Button size="icon" variant="ghost" className="rounded-full">
-            <span className="grid h-8 w-8 place-content-center rounded-full bg-purple-100 text-sm font-medium text-purple-700">
-              AS
+            <span className="">
+              <Avatar className="h-8 w-8 mx-auto">
+                <AvatarImage src={patient.image} alt="@shadcn" />
+                <AvatarFallback className="flex items-center justify-center bg-purple-100 text-sm text-purple-700 font-semibold shrink-0">
+                  {patient.firstName?.[0]}
+                  {patient.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
             </span>
           </Button>
         </SheetTrigger>
@@ -73,6 +81,7 @@ export default function MobileHeader() {
           </div>
         </SheetContent>
       </Sheet>
+    </div>
     </div>
   );
 }

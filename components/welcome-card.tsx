@@ -13,7 +13,7 @@ export default function WelcomeCard() {
         <h2 className="text-2xl font-semibold">
           <span className="font-normal ">Hello</span> {user.name},
         </h2>
-        <p className="mt-2 text-white/80 max-w-96">
+        <p className="mt-2 text-white/80 max-w-[450px]">
           Have a nice day and don't forget to take care of your health!
         </p>
         <Link

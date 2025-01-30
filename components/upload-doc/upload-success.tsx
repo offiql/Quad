@@ -1,5 +1,6 @@
-import { Check } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Check } from "lucide-react";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface UploadSuccessProps {
   onReset: () => void;
@@ -7,10 +8,10 @@ interface UploadSuccessProps {
 
 export default function UploadSuccess({ onReset }: UploadSuccessProps) {
   return (
-    <div className="mx-auto max-w-md text-center py-12 p-4">
-      <div className="mb-14 flex justify-center">
+    <div className="mx-auto max-w-md text-center p-4">
+      <div className="flex pb-6 justify-center">
         <div className="rounded-full bg-green-100 p-3">
-          <Check className="h-20 w-20 text-green-600" />
+          <Check className="h-36 w-36 text-green-600" />
         </div>
       </div>
       <h2 className="mb-2 text-xl font-semibold">
@@ -20,14 +21,16 @@ export default function UploadSuccess({ onReset }: UploadSuccessProps) {
         It takes 3-5 business days to review your documents
       </p>
       <div className="space-y-2">
-        <Button onClick={onReset} className="w-full py-3 bg-[#3B016B] hover:bg-[#300057] ">
-          Upload More Documents
+        <Button
+          onClick={onReset}
+          className="w-full py-3 bg-[#3B016B] hover:bg-[#300057] "
+        >
+          <Link href={"/upload-documents"}>Upload More Documents</Link>
         </Button>
         <Button variant="outline" className="w-full py-3">
-          See Uploaded Documents
+          <Link href={"/records"}>See Uploaded Documents</Link>
         </Button>
       </div>
     </div>
-  )
+  );
 }
-

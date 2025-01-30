@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { base_url } from "@/lib/utils";
+import { auth_url } from "@/lib/utils";
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -31,7 +31,7 @@ export default function ForgotPasswordForm() {
     setError("");
 
     try {
-      const response = await fetch(`${base_url}/api/auth/forgot-password`, {
+      const response = await fetch(`${auth_url}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

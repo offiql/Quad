@@ -4,6 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, FileText, Upload } from "lucide-react";
 import { FaHospitalUser } from "react-icons/fa6";
+import { MdFamilyRestroom } from "react-icons/md";
+import { Urbanist } from "next/font/google";
+
+const urbanist = Urbanist({ subsets: ["latin"] })
 
 const navigation = [
   {
@@ -22,6 +26,11 @@ const navigation = [
     icon: Upload,
   },
   {
+    name: "My Relations",
+    href: "/my-relations",
+    icon: MdFamilyRestroom,
+  },
+  {
     name: "Profile",
     href: "/profile",
     icon: FaHospitalUser,
@@ -34,7 +43,7 @@ export default function Sidebar() {
   return (
     <div className="hidden md:flex  h-full w-20 flex-col items-center bg-[#3B0764] py-8">
       <div className="flex flex-shrink-0 items-center">
-        <span className="text-2xl font-extralight text-white">Quad</span>
+        <span className={`text-2xl font-bold text-white  tracking-widest ${urbanist.className}`}>Quad</span>
       </div>
       <nav className="mt-12 flex flex-1 flex-col gap-y-4">
         {navigation.map((item) => (

@@ -58,10 +58,20 @@ export default function ProfileSection() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <Avatar className="mx-auto w-20 h-20">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>MS</AvatarFallback>
-        </Avatar>
+        {patient.image === "" ? (
+          <div className="w-20 h-20 mx-auto rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-2xl font-semibold shrink-0">
+            {patient.firstName?.[0]}
+            {patient.lastName?.[0]}
+          </div>
+        ) : (
+          <Avatar className="w-20 h-20 mx-auto">
+            <AvatarImage src={patient.image} alt="@shadcn" />
+            <AvatarFallback className="flex items-center justify-center text-2xl font-semibold shrink-0">
+              {patient.firstName?.[0]}
+              {patient.lastName?.[0]}
+            </AvatarFallback>
+          </Avatar>
+        )}
         <h2 className="text-xl font-semibold">{`${patient.firstName} ${patient.lastName}`}</h2>
         <p className="text-sm text-[#A3AED0] text-muted-foreground flex items-center justify-center gap-1">
           <span>{calculateAge(patient.dateOfBirth)} years old</span>

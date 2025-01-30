@@ -9,6 +9,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Urbanist } from "next/font/google";
+
+const urbanist = Urbanist({ subsets: ["latin"] })
 
 // Define Type for 'authorize' state
 type AuthorizeState = {
@@ -22,10 +25,6 @@ export default function AuthPage() {
     response_type: "code",
     client_id: "0a29e4ddcac85de100e6b3a9e416a32b",
   });
-
-  const searchParams = useSearchParams();
-
-
   return (
     <div className="min-h-dvh flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid lg:grid-cols-1 gap-8 items-center">
@@ -39,7 +38,7 @@ export default function AuthPage() {
             <CardContent className="p-6">
               <div className="flex items-center gap-2 justify-center mb-6">
                 {/* <Icons.logo className="w-8 h-8 text-blue-500" /> */}
-                <span className="text-3xl text-center font-medium ">
+                <span className={`text-3xl font-bold text-center tracking-widest ${urbanist.className}`}>
                   QUAD
                 </span>
               </div>

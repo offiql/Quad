@@ -6,6 +6,10 @@ import UploadDocumentsStep from "@/components/upload-doc/upload-doc";
 import DocumentDetailsStep from "@/components/upload-doc/detail-step";
 import UploadSuccess from "@/components/upload-doc/upload-success";
 import MobileHeader from "@/components/mobile-header";
+import { backend_url } from "@/lib/utils";
+import axios from "axios";
+import { getpatientData } from "@/lib/getTokens";
+import { toast } from "sonner";
 
 type DocumentType = "prescription" | "lab-report" | null;
 type UploadStep = "type-selection" | "upload" | "details" | "success";
@@ -14,8 +18,8 @@ export default function UploadDocumentsPage() {
   const [step, setStep] = useState<UploadStep>("type-selection");
   const [documentType, setDocumentType] = useState<DocumentType>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-
-  const handleTypeSelection = (type: "prescription" | "lab-report") => {
+  const [loader, setLoader] = useState(false);
+  const handleTypeSelection = (type: DocumentType) => {
     setDocumentType(type);
     setStep("upload");
   };
@@ -25,11 +29,38 @@ export default function UploadDocumentsPage() {
     setStep("details");
   };
 
-  const handleDetailsSubmitted = (details: any) => {
-    // Here you would typically send the files and details to your server
-    console.log("Files:", uploadedFiles);
-    console.log("Details:", details);
-    setStep("success");
+  const handleDetailsSubmitted = async (details: any) => {
+    const patient = getpatientData();
+    if (!uploadedFiles.length || !documentType) {
+      console.error("Files or document type missing");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("documentType", documentType);
+    formData.append("uploadedAt", new Date().toISOString());
+    formData.append("details", JSON.stringify(details));
+    formData.append("patientId", patient._id);
+
+    uploadedFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      setLoader(true);
+      const response = await axios.post(`${backend_url}/s3upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Details submitted successfully:", response.data);
+      toast.success("Documents uploaded successfully!");
+      setStep("success");
+    } catch (error) {
+      console.error("Details submission failed:", error);
+    } finally {
+      setLoader(false);
+    }
   };
 
   const handleReset = () => {
@@ -37,6 +68,7 @@ export default function UploadDocumentsPage() {
     setDocumentType(null);
     setUploadedFiles([]);
   };
+
   const handleBack = () => {
     switch (step) {
       case "upload":
@@ -76,6 +108,7 @@ export default function UploadDocumentsPage() {
         )}
         {step === "details" && (
           <DocumentDetailsStep
+            loader={loader}
             onNext={handleDetailsSubmitted}
             onBack={handleBack}
           />
