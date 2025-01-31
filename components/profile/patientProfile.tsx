@@ -158,7 +158,7 @@ export default function PatientProfile() {
       }
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setFamilyMembers(data);
     } catch (error) {
       toast.error("Error fetching relations");
@@ -170,10 +170,12 @@ export default function PatientProfile() {
     console.log(formData);
     setIsSubmitting(true);
     try {
+      const access_token = getAccessToken();
       const response = await fetch(`${backend_url}/patient/${formData._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -227,9 +229,9 @@ export default function PatientProfile() {
   const emergencyContactDetails = getEmergencyContact();
 
   return (
-    <div className="p-4 h-[calc(100dvh-68px)] md:h-full w-full">
+    <div className="p-4">
       {!isEditing ? (
-        <div className="border-none p-0 m-0 shadow-none w-full h-full overflow-y-auto overscroll-y-contain overflow-hidden hide-scrollbar">
+        <div className="border-none p-0 m-0">
           <div className="px-4 md:p-4">
             <div className="flex flex-row justify-between items-start md:items-center md:mb-8">
               <h1 className="text-2xl text-[#112449] font-bold mb-4 md:mb-0">
@@ -364,10 +366,7 @@ export default function PatientProfile() {
           </div>
         </div>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="w-full h-full space-y-8 overflow-y-auto overscroll-y-contain overflow-hidden hide-scrollbar"
-        >
+        <form onSubmit={handleSubmit} className=" space-y-8 ">
           <Card>
             <CardHeader className="flex md:flex-row md:justify-between md:items-center">
               <CardTitle className="text-2xl font-bold text-[#112449]">

@@ -1,6 +1,6 @@
 "use client";
 
-import { getpatientData } from "@/lib/getTokens";
+import { getAccessToken, getpatientData } from "@/lib/getTokens";
 import { backend_url } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -11,28 +11,8 @@ import { Patient } from "../types/patient";
 interface DataPoint {
   date: string;
   value: number;
-  _id:string
+  _id: string;
 }
-
-const diabetesData = [
-  { date: "2025-01-22", value: 85 },
-  { date: "2025-01-23", value: 65 },
-  { date: "2025-01-24", value: 35 },
-  { date: "2025-01-25", value: 45 },
-  { date: "2025-01-26", value: 75 },
-  { date: "2025-01-27", value: 40 },
-  { date: "2025-01-28", value: 90 },
-];
-
-const bloodPressureData = [
-  { date: "2025-01-22", value: 80 },
-  { date: "2025-01-23", value: 60 },
-  { date: "2025-01-24", value: 30 },
-  { date: "2025-01-25", value: 40 },
-  { date: "2025-01-26", value: 70 },
-  { date: "2025-01-27", value: 35 },
-  { date: "2025-01-28", value: 85 },
-];
 
 export default function HealthMonitoring() {
   const [isExpanded1, setIsExpanded1] = useState(true);
@@ -41,8 +21,6 @@ export default function HealthMonitoring() {
   const [bloodpressure, setBloodpressure] = useState<DataPoint[]>([]);
   const [patient, setPatient] = useState<Patient>();
   const updateBackend = async (updatedData: DataPoint[], type: string) => {
-    console.log("Starting updateBackend with:", { updatedData, type });
-
     try {
       const response = await fetch(`${backend_url}/patient/update-chart`, {
         method: "POST",
@@ -82,10 +60,18 @@ export default function HealthMonitoring() {
   const fetchData = async (type: string): Promise<DataPoint[]> => {
     const patient = getpatientData();
     try {
-      const response = await fetch(
-        `${backend_url}/patient/fetch-chart?patientId=${patient._id}&type=${type}`
-      );
+      const access_token = getAccessToken();
 
+      const response = await fetch(
+        `${backend_url}/patient/fetch-chart?patientId=${patient._id}&type=${type}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
       if (!response.ok) {
         // toast.error("Failed to update chart data");
         return [];

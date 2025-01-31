@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { getUserData } from "@/lib/getTokens";
+import { getAccessToken, getUserData } from "@/lib/getTokens";
 import { backend_url } from "@/lib/utils";
 import { setPatientData } from "@/store/authSlice";
 import { useRouter } from "next/navigation";
@@ -81,10 +81,12 @@ export default function PersonalDetails() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const access_token = getAccessToken();
       const response = await fetch(`${backend_url}/patient/save-details`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`
         },
         body: JSON.stringify(formData),
       });

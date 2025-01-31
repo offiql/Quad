@@ -16,7 +16,7 @@ export default function FamilyConnectionsPage() {
   const fetchRelations = useCallback(async () => {
     const access_token = getAccessToken();
     try {
-      const response = await fetch(`${backend_url}/patient/get-relations`, {
+      const response = await fetch(`${backend_url}/patient/get-all-relations`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -77,7 +77,8 @@ export default function FamilyConnectionsPage() {
   const handleUpdateStatus = useCallback(
     async (
       relationId: string,
-      newStatus: "pending" | "confirmed" | "rejected"
+      newStatus: "pending" | "confirmed" | "rejected",
+      canViewPeriodsData: "Yes" | "No"
     ) => {
       if (!patient) return;
 
@@ -95,6 +96,7 @@ export default function FamilyConnectionsPage() {
               patientId: patient._id,
               relationId,
               newStatus,
+              canViewPeriodsData
             }),
           }
         );

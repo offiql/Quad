@@ -31,15 +31,6 @@ interface PeriodData {
   endDate: Date;
 }
 
-const initialPeriodData: PeriodData[] = [
-  { startDate: new Date(2024, 5, 3), endDate: new Date(2024, 5, 8) },
-  { startDate: new Date(2024, 6, 2), endDate: new Date(2024, 6, 7) },
-  { startDate: new Date(2024, 7, 1), endDate: new Date(2024, 7, 6) },
-  { startDate: new Date(2024, 8, 30), endDate: new Date(2024, 9, 5) },
-  { startDate: new Date(2024, 9, 29), endDate: new Date(2024, 10, 3) },
-  { startDate: new Date(2024, 11, 2), endDate: new Date(2024, 11, 6) },
-  { startDate: new Date(2024, 11, 29), endDate: new Date(2025, 0, 3) },
-];
 
 export default function PeriodTracker() {
   const [selectedMonth, setSelectedMonth] = React.useState(new Date());

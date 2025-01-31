@@ -43,6 +43,7 @@ export interface FamilyMember {
   name: string;
   email: string;
   phone: string;
+  gender: string;
 }
 
 export interface Relation {
@@ -52,6 +53,7 @@ export interface Relation {
   requesterRelation: string;
   responderRelation: string;
   relationshipDetails?: string;
+  canViewPeriodsData: "Yes" | "No";
   status: string;
 }
 

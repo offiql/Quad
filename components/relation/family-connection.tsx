@@ -1,23 +1,45 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Pencil, HelpCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { EditRelationDialog } from "./edit-relation-dialogbox"
-import type { Relation } from "../types/patient"
+import { useState } from "react";
+import { Pencil, HelpCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { EditRelationDialog } from "./edit-relation-dialogbox";
+import type { Relation } from "../types/patient";
 
 interface FamilyConnectionsProps {
-  relationships: Relation[]
-  loggedInUserId: string
+  relationships: Relation[];
+  loggedInUserId: string;
   onUpdateRelation: (
     relationId: string,
     newRelation: string,
-    field: "requesterRelation" | "responderRelation",
-  ) => Promise<void>
-  onUpdateStatus: (relationId: string, newStatus: "pending" | "confirmed" | "rejected") => Promise<void>
+    field: "requesterRelation" | "responderRelation"
+  ) => Promise<void>;
+  onUpdateStatus: (
+    relationId: string,
+    newStatus: "pending" | "confirmed" | "rejected",
+    canViewPeriodsData: "Yes" | "No"
+  ) => Promise<void>;
 }
 
 export function FamilyConnections({
@@ -26,37 +48,53 @@ export function FamilyConnections({
   onUpdateRelation,
   onUpdateStatus,
 }: FamilyConnectionsProps) {
-  const [editingRelation, setEditingRelation] = useState<Relation | null>(null)
+  const [editingRelation, setEditingRelation] = useState<Relation | null>(null);
 
   const handleEdit = (relation: Relation) => {
-    setEditingRelation(relation)
-  }
+    setEditingRelation(relation);
+  };
 
   const handleSave = async (
     newYourRelation: string,
     newTheirRelation: string,
     newStatus: "pending" | "confirmed" | "rejected",
+    canViewPeriodsData: "Yes" | "No"
   ) => {
-    if (!editingRelation) return
+    if (!editingRelation) return;
 
-    const isRequester = editingRelation.requester.id === loggedInUserId
-    const newRequesterRelation = isRequester ? newYourRelation : newTheirRelation
-    const newResponderRelation = isRequester ? newTheirRelation : newYourRelation
-
+    const isRequester = editingRelation.requester.id === loggedInUserId;
+    const newRequesterRelation = isRequester
+      ? newYourRelation
+      : newTheirRelation;
+    const newResponderRelation = isRequester
+      ? newTheirRelation
+      : newYourRelation;
+    console.log(editingRelation.canViewPeriodsData);
     if (newRequesterRelation !== editingRelation.requesterRelation) {
-      await onUpdateRelation(editingRelation._id, newRequesterRelation, "requesterRelation")
+      await onUpdateRelation(
+        editingRelation._id,
+        newRequesterRelation,
+        "requesterRelation"
+      );
     }
 
     if (newResponderRelation !== editingRelation.responderRelation) {
-      await onUpdateRelation(editingRelation._id, newResponderRelation, "responderRelation")
+      await onUpdateRelation(
+        editingRelation._id,
+        newResponderRelation,
+        "responderRelation"
+      );
     }
 
-    if (newStatus !== editingRelation.status) {
-      await onUpdateStatus(editingRelation._id, newStatus)
+    if (
+      newStatus !== editingRelation.status ||
+      canViewPeriodsData !== editingRelation.canViewPeriodsData
+    ) {
+      await onUpdateStatus(editingRelation._id, newStatus, canViewPeriodsData);
     }
 
-    setEditingRelation(null)
-  }
+    setEditingRelation(null);
+  };
 
   return (
     <Card>
@@ -78,14 +116,22 @@ export function FamilyConnections({
           </TableHeader>
           <TableBody>
             {relationships.map((relation) => {
-              const isRequester = relation.requester.id === loggedInUserId
-              const familyMember = isRequester ? relation.responder : relation.requester
-              const yourRelation = isRequester ? relation.requesterRelation : relation.responderRelation
-              const theirRelation = isRequester ? relation.responderRelation : relation.requesterRelation
+              const isRequester = relation.requester.id === loggedInUserId;
+              const familyMember = isRequester
+                ? relation.responder
+                : relation.requester;
+              const yourRelation = isRequester
+                ? relation.requesterRelation
+                : relation.responderRelation;
+              const theirRelation = isRequester
+                ? relation.responderRelation
+                : relation.requesterRelation;
 
               return (
                 <TableRow key={relation._id}>
-                  <TableCell className="font-medium">{familyMember.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {familyMember.name}
+                  </TableCell>
                   <TableCell>
                     <span className="flex items-center gap-2">
                       {yourRelation}
@@ -120,9 +166,21 @@ export function FamilyConnections({
                   <TableCell>
                     <span
                       className={`
-                      ${relation.status === "pending" ? "bg-yellow-100 text-yellow-700" : ""}
-                      ${relation.status === "confirmed" ? "bg-green-100 text-green-700" : ""}
-                      ${relation.status === "rejected" ? "bg-red-100 text-red-700" : ""}
+                      ${
+                        relation.status === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : ""
+                      }
+                      ${
+                        relation.status === "confirmed"
+                          ? "bg-green-100 text-green-700"
+                          : ""
+                      }
+                      ${
+                        relation.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : ""
+                      }
                       p-0.5 px-4 rounded-full text-center mx-auto
                     `}
                     >
@@ -133,7 +191,11 @@ export function FamilyConnections({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button size="sm" variant="ghost" onClick={() => handleEdit(relation)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEdit(relation)}
+                          >
                             <Pencil className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
@@ -144,7 +206,7 @@ export function FamilyConnections({
                     </TooltipProvider>
                   </TableCell>
                 </TableRow>
-              )
+              );
             })}
           </TableBody>
         </Table>
@@ -156,6 +218,5 @@ export function FamilyConnections({
         loggedInUserId={loggedInUserId}
       />
     </Card>
-  )
+  );
 }
-
