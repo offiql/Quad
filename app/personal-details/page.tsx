@@ -24,6 +24,7 @@ interface UserData {
   email: string;
   name: string;
   userId: string;
+  type:string;
 }
 
 export default function PersonalDetails() {
@@ -94,7 +95,11 @@ export default function PersonalDetails() {
       if (response.ok) {
         toast.success("Details saved successfully!");
         dispatch(setPatientData(data));
-        router.push("/dashboard");
+        console.log(userData)
+        if(userData?.type==="admin"){
+          router.push("/admin/dashboard");
+        }
+        else router.push("/admin")
       } else {
         toast.error("Failed to save details");
       }

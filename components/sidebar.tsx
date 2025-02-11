@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, FileText, Upload } from "lucide-react";
+import { LayoutGrid, FileText, Upload, FileImage } from "lucide-react";
 import { FaHospitalUser } from "react-icons/fa6";
 import { MdFamilyRestroom } from "react-icons/md";
 import { Urbanist } from "next/font/google";
 
-const urbanist = Urbanist({ subsets: ["latin"] })
+const urbanist = Urbanist({ subsets: ["latin"] });
 
 const navigation = [
   {
@@ -34,19 +34,45 @@ const navigation = [
     name: "Profile",
     href: "/profile",
     icon: FaHospitalUser,
-  }
+  },
+];
+const adminNavigation = [
+  {
+    name: "Dashboard",
+    href: "/admin/dashboard",
+    icon: LayoutGrid,
+  },
+  {
+    name: "Documents",
+    href: "/admin/documents",
+    icon: FileText,
+  },
+  {
+    name: "Decoded Document",
+    href: "/admin/decoded-document",
+    icon: FileImage,
+  },
+  {
+    name: "Team",
+    href: "/admin/team",
+    icon: MdFamilyRestroom,
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-
+  const isAdmin = pathname.startsWith("/admin") ? adminNavigation : navigation;
   return (
     <div className="hidden md:flex  h-full w-20 flex-col items-center bg-[#3B0764] py-8">
       <div className="flex flex-shrink-0 items-center">
-        <span className={`text-2xl font-bold text-white  tracking-widest ${urbanist.className}`}>Quad</span>
+        <span
+          className={`text-2xl font-bold text-white  tracking-widest ${urbanist.className}`}
+        >
+          Quad
+        </span>
       </div>
       <nav className="mt-12 flex flex-1 flex-col gap-y-4">
-        {navigation.map((item) => (
+        {isAdmin.map((item) => (
           <Link
             key={item.name}
             href={item.href}

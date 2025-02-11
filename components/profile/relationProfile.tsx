@@ -66,7 +66,7 @@ export default function RelationProfile({
 
   return (
     <div className="p-4 h-full">
-      <h2 className="text-2xl font-bold mb-4">Family Members</h2>
+      <h2 className="text-2xl text-[#112449] pl-4 font-bold mb-4">Family Members</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 p-4 gap-4">
         {familyMembers.map((relation, index) => {
           const unique =

@@ -74,7 +74,10 @@ export default function CallbackPage() {
       if (userExists.exists) {
         console.log(userExists.patient);
         dispatch(setPatientData(userExists.patient));
-        router.push("/dashboard");
+        if(decodedToken?.type==="admin"){
+          router.push("/admin/dashboard");
+        }
+        else router.push("/dashboard")
       } else {
         router.push("/personal-details"); // Redirect to the form page
       }

@@ -33,7 +33,7 @@ export default function DashboardPage() {
         <HealthMonitoring />
         <PeriodTracker />
       </div>
-      <div className="hidden md:block md:col-span-1 hide-scrollbar pt-6 pb-3 pl-0 overflow-y-auto h-dvh">
+      <div className="hidden md:block md:col-span-1 hide-scrollbar pt-6 pb-3 pl-0 overflow-y-auto overflow-hidden h-dvh">
         <ProfileSection />
         <Notifications />
         <KidsVacinations />
