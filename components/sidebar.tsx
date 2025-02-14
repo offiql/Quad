@@ -72,20 +72,39 @@ export default function Sidebar() {
         </span>
       </div>
       <nav className="mt-12 flex flex-1 flex-col gap-y-4">
-        {isAdmin.map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className={`flex flex-col items-center gap-1 p-2 text-sm ${
-              pathname === item.href
-                ? "bg-white/10 text-white"
-                : "text-white/60 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <item.icon className="h-6 w-6" />
-            <span className="text-xs text-center">{item.name}</span>
-          </Link>
-        ))}
+        {isAdmin
+          .filter((item) => item.name !== "Decoded Document")
+          .map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex flex-col items-center gap-1 p-2 text-sm ${
+                pathname.includes(item.href)
+                  ? "bg-white/10 text-white"
+                  : "text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <item.icon className="h-6 w-6" />
+              <span className="text-xs text-center">{item.name}</span>
+            </Link>
+          ))}
+        {pathname.includes("/admin/decoded-document") &&
+          isAdmin
+            .filter((item) => item.name == "Decoded Document")
+            .map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 p-2 text-sm ${
+                  pathname.includes(item.href)
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <item.icon className="h-6 w-6" />
+                <span className="text-xs text-center">{item.name}</span>
+              </Link>
+            ))}
       </nav>
     </div>
   );

@@ -7,9 +7,9 @@ import { useCallback, useRef, useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export default function PDFViewer() {
+export default function PDFViewer({src}:{src:string}) {
   PDFJS.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${PDFJS.version}/build/pdf.worker.min.mjs`
-  const src = "https://www.sldttc.org/allpdf/21583473018.pdf"
+  // const src = "https://www.sldttc.org/allpdf/21583473018.pdf"
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy>()
   const [currentPage, setCurrentPage] = useState(1)

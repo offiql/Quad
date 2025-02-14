@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,90 +14,69 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, Link2 } from "lucide-react";
 import PDFViewer from "@/components/admin/document/pdf-viewer";
 import { Badge } from "@/components/ui/badge";
-
-interface Document {
-  documentName: string;
-  patientName: string;
-  assignedTo: string;
-  receivedDate: string;
-  uploadTime: string;
-  labelledDate: string;
-  processStatus: string;
-}
-
-const documents: Document[] = [
-  {
-    documentName: "Document 1",
-    patientName: "Patient 1",
-    assignedTo: "Doctor 1",
-    receivedDate: "2024-03-08",
-    uploadTime: "10:00 AM",
-    labelledDate: "2024-03-09",
-    processStatus: "Labelled",
-  },
-  {
-    documentName: "Document 2",
-    patientName: "Patient 2",
-    assignedTo: "Doctor 2",
-    receivedDate: "2024-03-09",
-    uploadTime: "11:00 AM",
-    labelledDate: "2024-03-10",
-    processStatus: "Pending",
-  },
-  {
-    documentName: "Document 3",
-    patientName: "Patient 3",
-    assignedTo: "Doctor 3",
-    receivedDate: "2024-03-09",
-    uploadTime: "11:00 AM",
-    labelledDate: "2024-03-10",
-    processStatus: "In process",
-  },
-  {
-    documentName: "Document 4",
-    patientName: "Patient 4",
-    assignedTo: "Doctor 4",
-    receivedDate: "2024-03-09",
-    uploadTime: "11:00 AM",
-    labelledDate: "2024-03-10",
-    processStatus: "Rejected",
-  },
-];
+import { backend_url } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 const DocumentTable = () => {
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
-    null
-  );
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10); // Default page size
+  const [totalPages, setTotalPages] = useState(1);
 
-  const handleViewDocument = (doc: Document) => {
+  useEffect(() => {
+    const getDocs = async () => {
+      const response = await fetch(`${backend_url}/admin/uploaded-documents?page=${page}&limit=${limit}`);
+      const data = await response.json();
+      setDocuments(data.data);
+      setTotalPages(data.pagination.totalPages);
+    };
+    getDocs();
+  }, [page, limit]);
+
+  const handleViewDocument = (doc: any) => {
     setSelectedDocument(doc);
   };
 
   const handleCloseDialog = () => {
     setSelectedDocument(null);
   };
-  const getStatusColor = (status: Document["processStatus"]) => {
+
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case "Labelled":
+      case "confirmed":
         return "bg-green-100 text-green-800 hover:bg-green-100";
       case "In process":
         return "bg-orange-100 text-orange-800 hover:bg-orange-100";
-      case "Pending":
+      case "pending":
         return "bg-gray-100 text-gray-800 hover:bg-gray-100";
-      case "Rejected":
+      case "rejected":
         return "bg-red-100 text-red-800 hover:bg-red-100";
       default:
         return "";
     }
   };
+
+  function formatDate(timestamp: string | null | undefined): string {
+    if (!timestamp) return "N/A"; // Handle missing dates
+  
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return "Invalid Date"; // Handle invalid date values
+  
+    return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
+  }
+    
+
   return (
     <div className="w-full p-4 pt-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Submitted document</h2>{" "}
+      <div className="mb-6 flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Submitted Documents</h2>
       </div>
+      
       <Table>
         <TableHeader>
           <TableRow>
@@ -112,23 +91,23 @@ const DocumentTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {documents.map((doc) => (
-            <TableRow key={doc.documentName}>
-              <TableCell>{doc.documentName}</TableCell>
+          {documents.map((doc: any, index) => (
+            <TableRow key={index}>
+              <TableCell className="capitalize">{doc.type}</TableCell>
               <TableCell>{doc.patientName}</TableCell>
               <TableCell>{doc.assignedTo}</TableCell>
-              <TableCell>{doc.receivedDate}</TableCell>
-              <TableCell>{doc.uploadTime}</TableCell>
-              <TableCell>{doc.labelledDate}</TableCell>
+              <TableCell>{doc.date}</TableCell>
+              <TableCell>{formatDate(doc.createdAt)}</TableCell>
+              <TableCell>{formatDate(doc.updatedAt)}</TableCell>
               <TableCell>
                 <Badge
                   variant="secondary"
-                  className={`${getStatusColor(doc.processStatus)} font-normal`}
+                  className={`${getStatusColor(doc.status)} font-normal`}
                 >
-                  {doc.processStatus}
+                  {doc.status}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="flex gap-2 items-center">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -137,17 +116,49 @@ const DocumentTable = () => {
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
+                <Link href={`/admin/decoded-document/${doc._id}`}><Link2 className="h-4 w-4"/></Link>
+
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <Button
+          variant="outline"
+          onClick={() => setPage(page - 1)}
+          disabled={page === 1}
+        >
+          <ChevronLeft className="h-5 w-5" /> Previous
+        </Button>
+        <span className="text-sm">
+          Page {page} of {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages}
+        >
+          Next <ChevronRight className="h-5 w-5" />
+        </Button>
+      </div>
+
       <Dialog open={selectedDocument !== null} onOpenChange={handleCloseDialog}>
-        <DialogContent>
+        <DialogContent className="max-h-dvh max-w-3xl overflow-y-auto hide-scrollbar ">
           <DialogHeader>
             <DialogTitle>Document Details</DialogTitle>
           </DialogHeader>
-          <PDFViewer />
+          {selectedDocument?.fileUrl?.toLowerCase().endsWith(".pdf") ? (
+            <PDFViewer src={selectedDocument?.fileUrl} />
+          ) : (
+            <img
+              src={selectedDocument?.fileUrl || "/placeholder.svg"}
+              alt="Prescription Preview"
+              className="w-full h-full object-contain"
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
