@@ -107,6 +107,7 @@ export default function LoginForm({
   async function handleLoginSuccess(data: any) {
     const { access_token, refresh_token } = data;
     const userData: any = jwtDecode(access_token);
+
     dispatch(setTokens({ access_token, refresh_token }));
     dispatch(setUserData(userData));
     toast.success("Log In Successful!");
@@ -127,7 +128,9 @@ export default function LoginForm({
     if (userExists.exists) {
       console.log(userExists.patient);
       dispatch(setPatientData(userExists.patient));
-      router.push("/dashboard");
+      if (userData?.type === "team") {
+        router.push("/team/dashboard");
+      } else router.push("/dashboard");
     } else {
       router.push("/personal-details"); // Redirect to the form page
     }

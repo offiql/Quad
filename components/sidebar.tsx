@@ -6,6 +6,7 @@ import { LayoutGrid, FileText, Upload, FileImage } from "lucide-react";
 import { FaHospitalUser } from "react-icons/fa6";
 import { MdFamilyRestroom } from "react-icons/md";
 import { Urbanist } from "next/font/google";
+import { getUserData } from "@/lib/getTokens";
 
 const urbanist = Urbanist({ subsets: ["latin"] });
 
@@ -59,9 +60,35 @@ const adminNavigation = [
   },
 ];
 
+const teamNavigation = [
+  {
+    name: "Dashboard",
+    href: "/team/dashboard",
+    icon: LayoutGrid,
+  },
+  {
+    name: "Documents",
+    href: "/team/documents",
+    icon: FileText,
+  },
+  {
+    name: "Decoded Document",
+    href: "/team/decoded-document",
+    icon: FileImage,
+  },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin") ? adminNavigation : navigation;
+  const user = getUserData();
+  const isTeam = user.type === "team" && pathname.startsWith("/team");
+  const isAdmin =
+    user.type === "admin" && pathname.startsWith("/admin")
+      ? adminNavigation
+      : isTeam
+      ? teamNavigation
+      : navigation;
+
   return (
     <div className="hidden md:flex  h-full w-20 flex-col items-center bg-[#3B0764] py-8">
       <div className="flex flex-shrink-0 items-center">

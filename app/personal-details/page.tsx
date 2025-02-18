@@ -98,8 +98,9 @@ export default function PersonalDetails() {
         console.log(userData)
         if(userData?.type==="admin"){
           router.push("/admin/dashboard");
-        }
-        else router.push("/admin")
+        }else if(userData?.type==="team")
+          router.push("/team/dashboard")
+        else router.push("/dashboard")
       } else {
         toast.error("Failed to save details");
       }
