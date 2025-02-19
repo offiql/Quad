@@ -1,18 +1,18 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { PrescriptionPDF } from "./precription-pdf";
 import { backend_url } from "@/lib/utils";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { X } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PrescriptionPDF } from "./precription-pdf";
 
 interface Medicine {
   id: number;
@@ -114,6 +114,7 @@ export default function PrescriptionForm({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="processing">Processing</SelectItem>
               <SelectItem value="confirmed">Confirmed</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>

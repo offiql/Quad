@@ -50,7 +50,7 @@ const DocumentTable = () => {
     switch (status) {
       case "confirmed":
         return "bg-green-100 text-green-800 hover:bg-green-100";
-      case "In process":
+      case "processing":
         return "bg-orange-100 text-orange-800 hover:bg-orange-100";
       case "pending":
         return "bg-gray-100 text-gray-800 hover:bg-gray-100";
