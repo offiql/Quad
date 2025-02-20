@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { backend_url } from "@/lib/utils";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -13,6 +19,7 @@ import { X } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "sonner";
 import { PrescriptionPDF } from "./precription-pdf";
+import { getUserData } from "@/lib/getTokens";
 
 interface Medicine {
   id: number;
@@ -32,18 +39,20 @@ interface FormData {
   additionalNotes: string;
 }
 
-
-
 export default function PrescriptionForm({
   doc,
   setDoc,
   formData,
   setFormData,
+  user,
+  handleAssignDocument,
 }: {
-  doc:any
-  setDoc:any
+  doc: any;
+  setDoc: any;
   formData: FormData;
   setFormData: Dispatch<SetStateAction<FormData | undefined>>;
+  user: any;
+  handleAssignDocument: any;
 }) {
   const [availableComplaints] = useState([
     "Fever with chills",
@@ -51,12 +60,11 @@ export default function PrescriptionForm({
     "Cough",
     "Cold",
   ]);
-
   const handleComplaintToggle = (complaint: string) => {
-    setFormData((prev:any) => ({
+    setFormData((prev: any) => ({
       ...prev,
       complaints: prev.complaints.includes(complaint)
-        ? prev.complaints.filter((c:any) => c !== complaint)
+        ? prev.complaints.filter((c: any) => c !== complaint)
         : [...prev.complaints, complaint],
     }));
   };
@@ -68,14 +76,14 @@ export default function PrescriptionForm({
       dosage: "",
       duration: "",
     };
-    setFormData((prev:any) => ({
+    setFormData((prev: any) => ({
       ...prev,
       medicines: [...prev.medicines, newMedicine],
     }));
   };
 
   const addAdvice = () => {
-    setFormData((prev:any) => ({
+    setFormData((prev: any) => ({
       ...prev,
       advice: [...prev.advice, ""],
     }));
@@ -83,14 +91,17 @@ export default function PrescriptionForm({
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`${backend_url}/admin/save/decoded-doc/${doc?._id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({formData, status:doc.status}),
-      });
-  
+      const response = await fetch(
+        `${backend_url}/admin/save/decoded-doc/${doc?._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ formData, status: doc.status }),
+        }
+      );
+
       if (response.ok) {
         toast.success("Saved successfully");
       } else {
@@ -101,31 +112,41 @@ export default function PrescriptionForm({
     }
   };
   const handleStatusChange = (value: "pending" | "confirmed" | "rejected") => {
-    setDoc((prev: any) => ({ ...prev, status: value }))
-  }
+    setDoc((prev: any) => ({ ...prev, status: value }));
+  };
   return (
     <div className="flex-1 p-6 overflow-y-auto hide-scrollbar overflow-hidden overscroll-contain">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Decoded Document</h2>
-        <div className="flex items-center space-x-2">
-          <Select value={doc.status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={handleSave}>Save</Button>
-          <PDFDownloadLink document={<PrescriptionPDF formData={formData} />} fileName="decoded-document.pdf">
-            {({ blob, url, loading, error }) => (
-              <Button disabled={loading}>{loading ? "Generating PDF..." : "Download PDF"}</Button>
+        <h2 className="text-xl font-semibold">Decoded Document</h2>
+        {user && (
+          <div className="flex items-center space-x-2">
+            <Select value={doc.status} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="processing">Processing</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={handleSave}>Save</Button>
+            {user?.type === "team" && (
+              <Button onClick={handleAssignDocument}>Next</Button>
             )}
-          </PDFDownloadLink>
-        </div>
+            <PDFDownloadLink
+              document={<PrescriptionPDF formData={formData} />}
+              fileName="decoded-document.pdf"
+            >
+              {({ blob, url, loading, error }) => (
+                <Button disabled={loading}>
+                  {loading ? "Generating PDF..." : "Download PDF"}
+                </Button>
+              )}
+            </PDFDownloadLink>
+          </div>
+        )}
       </div>
 
       <div className="space-y-6">
@@ -135,7 +156,10 @@ export default function PrescriptionForm({
           <Input
             value={formData.firstName}
             onChange={(e) =>
-              setFormData((prev:any) => ({ ...prev, firstName: e.target.value }))
+              setFormData((prev: any) => ({
+                ...prev,
+                firstName: e.target.value,
+              }))
             }
             placeholder="OPDS PATIENT"
           />
@@ -171,7 +195,7 @@ export default function PrescriptionForm({
           <Textarea
             value={formData.clinicalFindings}
             onChange={(e) =>
-              setFormData((prev:any) => ({
+              setFormData((prev: any) => ({
                 ...prev,
                 clinicalFindings: e.target.value,
               }))
@@ -185,7 +209,10 @@ export default function PrescriptionForm({
           <Input
             value={formData.diagnosis}
             onChange={(e) =>
-              setFormData((prev:any) => ({ ...prev, diagnosis: e.target.value }))
+              setFormData((prev: any) => ({
+                ...prev,
+                diagnosis: e.target.value,
+              }))
             }
           />
         </div>
@@ -214,7 +241,7 @@ export default function PrescriptionForm({
                         ...medicine,
                         name: e.target.value,
                       };
-                      setFormData((prev:any) => ({
+                      setFormData((prev: any) => ({
                         ...prev,
                         medicines: newMedicines,
                       }));
@@ -231,7 +258,7 @@ export default function PrescriptionForm({
                         ...medicine,
                         dosage: e.target.value,
                       };
-                      setFormData((prev:any) => ({
+                      setFormData((prev: any) => ({
                         ...prev,
                         medicines: newMedicines,
                       }));
@@ -248,7 +275,7 @@ export default function PrescriptionForm({
                         ...medicine,
                         duration: e.target.value,
                       };
-                      setFormData((prev:any) => ({
+                      setFormData((prev: any) => ({
                         ...prev,
                         medicines: newMedicines,
                       }));
@@ -277,7 +304,7 @@ export default function PrescriptionForm({
                 onChange={(e) => {
                   const newAdvice = [...formData.advice];
                   newAdvice[index] = e.target.value;
-                  setFormData((prev:any) => ({ ...prev, advice: newAdvice }));
+                  setFormData((prev: any) => ({ ...prev, advice: newAdvice }));
                 }}
               />
             ))}
@@ -290,7 +317,7 @@ export default function PrescriptionForm({
           <Textarea
             value={formData.additionalNotes}
             onChange={(e) =>
-              setFormData((prev:any) => ({
+              setFormData((prev: any) => ({
                 ...prev,
                 additionalNotes: e.target.value,
               }))

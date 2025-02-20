@@ -31,18 +31,18 @@ const DocumentTable = () => {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
+  const getDocs = async () => {
+    const response = await fetch(
+      `${backend_url}/admin/${user.userId}/assigned-pending-documents?page=${page}&limit=${limit}`
+    );
+    const data = await response.json();
+    if (data.message) {
+      toast.error(data.message);
+    }
+    setDocuments(data.data);
+    setTotalPages(data.pagination.totalPages);
+  };
   useEffect(() => {
-    const getDocs = async () => {
-      const response = await fetch(
-        `${backend_url}/admin/${user.userId}/assigned-pending-documents?page=${page}&limit=${limit}`
-      );
-      const data = await response.json();
-      if (data.message) {
-        toast.error(data.message);
-      }
-      setDocuments(data.data);
-      setTotalPages(data.pagination.totalPages);
-    };
     if (user.userId) {
       getDocs();
     }
@@ -98,7 +98,7 @@ const DocumentTable = () => {
         return;
       }
 
-      setDocuments(updatedDocs.data);
+      getDocs();
     } catch (error) {
       console.error("Error assigning documents:", error);
       toast.error("Something went wrong. Please try again.");

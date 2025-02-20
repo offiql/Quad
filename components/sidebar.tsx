@@ -115,7 +115,7 @@ export default function Sidebar() {
               <span className="text-xs text-center">{item.name}</span>
             </Link>
           ))}
-        {pathname.includes("/admin/decoded-document") &&
+        {(pathname.includes("/admin/decoded-document")||pathname.includes("/team")) &&
           isAdmin
             .filter((item) => item.name == "Decoded Document")
             .map((item) => (

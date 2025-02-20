@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useParams } from "next/navigation"; // Import useParams
+import { useParams, useRouter } from "next/navigation"; // Import useParams
 import { Card } from "@/components/ui/card";
 import PrescriptionForm from "@/components/admin/document/precription-form";
 import { backend_url } from "@/lib/utils";
+import { toast } from "sonner";
+import { getUserData } from "@/lib/getTokens";
 interface Medicine {
   id: number;
   name: string;
@@ -39,29 +41,65 @@ const PDFViewers = dynamic(
 export default function DecodedDocument() {
   const params = useParams();
   const [doc, setDoc] = useState();
+  const user = getUserData();
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<string>(
     "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
   );
-const [formData, setFormData] = useState<FormData>()
+  const [formData, setFormData] = useState<FormData>();
   const isFileTypePDF = selectedFile.toLowerCase().endsWith(".pdf");
+  const handleAssignDocument = async () => {
+    try {
+      const response = await fetch(
+        `${backend_url}/admin/${user.userId}/assign-pending-documents`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
+      const newDocId = await response.json();
+
+      if (!response.ok) {
+        // Handle API error response properly
+        toast.error(newDocId.message || "Failed to assign documents.");
+        return;
+      }
+      router.push(`/team/decoded-document/${newDocId}`);
+    } catch (error) {
+      console.error("Error assigning documents:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
   useEffect(() => {
     const getDoc = async () => {
-      if (!params?.doc) return;
+      if (!params?.doc) {
+        return;
+      }
       const response = await fetch(`${backend_url}/admin/doc/${params.doc}`);
       const data = await response.json();
       setSelectedFile(data.fileUrl);
-      setFormData(data.decodedDocDetails)
-      setDoc(data)
+      setFormData(data.decodedDocDetails);
+      setDoc(data);
     };
-
     getDoc();
   }, [params]); // Ensure useEffect runs when params change
 
   return (
     <div className="flex h-dvh hide-scrollbar">
       {/* Left Side - Form */}
-      {doc && formData && <PrescriptionForm doc={doc} setDoc={setDoc} formData={formData} setFormData={setFormData} />}
+      {doc && formData && (
+        <PrescriptionForm
+          doc={doc}
+          setDoc={setDoc}
+          formData={formData}
+          setFormData={setFormData}
+          user={user}
+          handleAssignDocument={handleAssignDocument}
+        />
+      )}
 
       {/* Right Side - Preview */}
       <div className="w-[600px] border-l flex-1 overflow-y-auto hide-scrollbar overflow-hidden overscroll-contain">
